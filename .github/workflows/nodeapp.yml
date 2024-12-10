@@ -13,8 +13,8 @@ jobs:
         run: npm ci
       - name: build app
         run: npm run build
-    #   - name: upload artifact
-    #     uses: actions/upload_artifacts@v4
-    #     with:
-    #       name: dists/
-    #       path: 
+      - name: upload artifact
+        uses: actions/upload_artifacts@v4
+        with:
+          name: mynode-app
+          path: dist
