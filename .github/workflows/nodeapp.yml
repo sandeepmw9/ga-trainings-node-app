@@ -1,0 +1,20 @@
+name: day4-hands-on-nodeapp
+on: 
+  workflow_dispatch:
+jobs:
+  build_and_publish_node_app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get code
+        uses: actions/checkout@v4
+      - name: setup-node
+        uses: actions/setup-node@v4
+      - name: install dependencies
+        run: npm ci
+      - name: build app
+        run: npm run build
+    #   - name: upload artifact
+    #     uses: actions/upload_artifacts@v4
+    #     with:
+    #       name: dists/
+    #       path: 
