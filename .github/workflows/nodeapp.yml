@@ -18,6 +18,7 @@ jobs:
       - name: install dependencies
         run: npm ci
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: get code
@@ -26,7 +27,8 @@ jobs:
         run: npm ci
       - name: test code
         run: npm run test
-  build_deploy:
+  publish:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: get-code
@@ -39,13 +41,13 @@ jobs:
           name: mynode-app
           path: dist
   deploy:
-    needs: build_deploy
+    needs: publish
     uses: ./.github/workflows/called.yml
     with:
       artifact-name: mynode-app
-  print-deploy-job: 
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: print outout from reusable workflow
-        run: echo "${{ needs.deploy.outputs.result }}" #this is how we are accessing the output from reusable workflow, which we stored with name result.
+  # print-deploy-job: 
+  #   needs: deploy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: print outout from reusable workflow
+  #       run: echo "${{ needs.deploy.outputs.result }}" #this is how we are accessing the output from reusable workflow, which we stored with name result.
