@@ -1,16 +1,36 @@
-name: day4-hands-on-nodeapp
+name: sample-node-app
 on: 
   workflow_dispatch:
 jobs:
-  build_and_publish_node_app:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+          node_version: [12, 14, 16] #parallel execution on multiple node versions with different OS
+          os_version: [ubuntu-latest, windows-latest]
+    runs-on: ${{matrix.os_version}}
     steps:
       - name: get code
         uses: actions/checkout@v4
       - name: setup-node
         uses: actions/setup-node@v4
+        with:
+          node_version: ${{matrix.node_version}}
       - name: install dependencies
         run: npm ci
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get code
+        uses: actions/checkout@v4
+      - name: install dependencies
+        run: npm ci
+      - name: test code
+        run: npm run test
+  build_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get-code
+        uses: actions/checkout@v4
       - name: build app
         run: npm run build
       - name: upload artifact
@@ -18,3 +38,14 @@ jobs:
         with:
           name: mynode-app
           path: dist
+  deploy:
+    needs: build_deploy
+    uses: ./.github/workflows/called.yml
+    with:
+      artifact-name: mynode-app
+  print-deploy-job: 
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: print outout from reusable workflow
+        run: echo "${{ needs.deploy.outputs.result }}" #this is how we are accessing the output from reusable workflow, which we stored with name result.
